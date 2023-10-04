@@ -1,0 +1,23 @@
+.autocomplete {
+  width: 100%;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+.inputContainer {
+  padding-top: 20px;
+  width: 100%;
+  display: flex;
+  max-width: 500px;
+  flex-direction: column;
+}
+
+.input {
+  height: 30px;
+}
+
+.suggestions {
+  background-color: rgb(235, 235, 235);
+  width: 100%;
+}
