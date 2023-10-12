@@ -4,8 +4,15 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AutoComplete } from "../components/AutoComplente";
 const crypto = require("crypto-js");
 
+type Results = {
+  [key: string]: {
+    name: string;
+    id: number;
+  };
+};
+
 export default function Marvel() {
-  const [results, setResults] = useState({});
+  const [results, setResults] = useState<Results>({});
 
   const fetchMarvelData = async (
     e: string,
@@ -20,18 +27,32 @@ export default function Marvel() {
         const data = await response.json();
         const newResults = { ...results };
 
-        data.data.results.forEach((result: any) => {         
-          newResults[result.id] = {
+        data.data.results.forEach((result: any) => {
+          newResults[result.name] = {
             name: result.name,
+            id: result.id,
           };
-          setResults(newResults);
         });
-        console.log("data.data", data.data)
+
+        setResults(newResults);
       } catch (error) {
         setInputValue("");
         console.log("error: ", error);
       }
     }
+  };
+
+  const autoCompleteClick = (id: number) => {
+    console.log("id", id);
+  };
+
+  const searchClick = (inputValue: string) => {
+    console.log("inputValue", inputValue);
+    const searchId = Object.keys(results).find((result) => {
+      return inputValue.toLowerCase() === result.toLowerCase();
+    });
+
+    console.log("searchId", searchId && results[searchId].id);
   };
 
   // const MARVEL_API_BASE = "http://gateway.marvel.com/v1/public";
@@ -65,7 +86,12 @@ export default function Marvel() {
 
   return (
     <div>
-      <AutoComplete onInputValue={fetchMarvelData} options={results} />
+      <AutoComplete
+        onInputValue={fetchMarvelData}
+        onSearchClick={searchClick}
+        onAutoCompleteClick={autoCompleteClick}
+        options={results}
+      />
     </div>
   );
 }

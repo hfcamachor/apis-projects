@@ -1,18 +1,31 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "./autocomple.module.css";
 
+type Results = {
+  [key: string]: {
+    name: string;
+    id: number
+  };
+};
+
 interface AutoCompleteProps {
   onInputValue: (
     e: string,
     query: string,
     setInputValue: Dispatch<SetStateAction<string>>
   ) => void;
-  options: any;
+  options: Results;
+  onSearchClick: (inputValue: string) => void
+  onAutoCompleteClick: (id: number) => void
 }
 
-export const AutoComplete = ({ onInputValue, options }: AutoCompleteProps) => {
-  const [inputValue, setInputValue] = useState("");
-  const [searchedWords, setSearchedWords] = useState([]);
+type SearchedWords = {
+  [key: string]: {};
+};
+
+export const AutoComplete = ({ onInputValue, options, onSearchClick, onAutoCompleteClick }: AutoCompleteProps) => {
+  const [inputValue, setInputValue] = useState<string>("");
+  const [searchedWords, setSearchedWords] = useState<SearchedWords>({});
 
   useEffect(() => {
     const newSearchedWord = { ...searchedWords };
@@ -25,16 +38,28 @@ export const AutoComplete = ({ onInputValue, options }: AutoCompleteProps) => {
     setSearchedWords(newSearchedWord);
   }, [inputValue]);
 
+  const filterValues = () => {
+    const listToShow = Object.values(options).filter((elem) => {
+      const elemName = elem.name.toLowerCase();
+      const inputValueToCheck = inputValue.toLowerCase();
+      if (elemName.startsWith(inputValueToCheck)) {
+        return elem;
+      }
+    });
+
+    return listToShow.slice(0, 10);
+  };
+
   const renderSuggestions = () => {
     return (
       <div className={styles.suggestions}>
-        <ul>
-          {Object.values(options).map((elem, index) => {
-            const elemName = elem.name.toLowerCase();
-            const inputValueToCheck = inputValue.toLowerCase();
-            if (elemName.includes(inputValueToCheck)) {
-              return <div key={index}>{elem.name}</div>; // Add a unique key for each element
-            }
+        <ul className={styles.suggestionsList}>
+          {Object.values(filterValues()).map((elem, index) => {
+            return (
+              <li key={index}>
+                <button className={styles.suggestionButton} onClick={() => onAutoCompleteClick(elem.id)}>{elem.name}</button>
+              </li>
+            );
           })}
         </ul>
       </div>
@@ -44,12 +69,15 @@ export const AutoComplete = ({ onInputValue, options }: AutoCompleteProps) => {
   return (
     <div className={styles.autocomplete}>
       <div className={styles.inputContainer}>
-        <input
-          className={styles.input}
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
+        <div className={styles.inputAndSearchButton}>
+          <input
+            className={styles.input}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <button className={styles.inputSearchButton} onClick={() => onSearchClick(inputValue)}>Search</button>
+        </div>
         {inputValue && Object.keys(options).length > 0 && renderSuggestions()}
       </div>
     </div>
