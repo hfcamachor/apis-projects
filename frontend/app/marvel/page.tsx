@@ -16,13 +16,12 @@ export default function Marvel() {
 
   const fetchMarvelData = async (
     e: string,
-    query: string,
     setInputValue: Dispatch<SetStateAction<string>>
   ) => {
     if (e) {
       try {
         const response = await fetch(
-          `http://localhost:8000/marvel?${query}=${e}`
+          `http://localhost:8000/marvel?nameStartsWith=${e}`
         );
         const data = await response.json();
         const newResults = { ...results };
@@ -42,17 +41,28 @@ export default function Marvel() {
     }
   };
 
+  const fetchIdCharacterById = async (e: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/marvelCharacter?${e}`);
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
+
   const autoCompleteClick = (id: number) => {
-    console.log("id", id);
+    fetchIdCharacterById(id);
   };
 
   const searchClick = (inputValue: string) => {
-    console.log("inputValue", inputValue);
     const searchId = Object.keys(results).find((result) => {
       return inputValue.toLowerCase() === result.toLowerCase();
     });
 
-    console.log("searchId", searchId && results[searchId].id);
+    if (searchId && results[searchId].id) {
+      fetchIdCharacterById(results[searchId].id);
+    }
   };
 
   // const MARVEL_API_BASE = "http://gateway.marvel.com/v1/public";

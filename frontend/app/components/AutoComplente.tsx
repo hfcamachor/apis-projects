@@ -11,7 +11,6 @@ type Results = {
 interface AutoCompleteProps {
   onInputValue: (
     e: string,
-    query: string,
     setInputValue: Dispatch<SetStateAction<string>>
   ) => void;
   options: Results;
@@ -31,7 +30,7 @@ export const AutoComplete = ({ onInputValue, options, onSearchClick, onAutoCompl
     const newSearchedWord = { ...searchedWords };
 
     if (!Object.keys(newSearchedWord).includes(inputValue)) {
-      onInputValue(inputValue, "nameStartsWith", setInputValue);
+      onInputValue(inputValue, setInputValue);
     }
 
     newSearchedWord[inputValue] = {};

@@ -5,6 +5,7 @@ require("dotenv").config();
 const crypto = require("crypto-js");
 const cors = require("cors");
 app.use(cors());
+const querystring = require("querystring");
 
 const marvelApiBase = process.env.MARVEL_API_BASE;
 const marvelPublicKey = process.env.MARVEL_PUBLIC_KEY;
@@ -26,13 +27,29 @@ app.get("/marvel", async (req, res) => {
     const response = await fetch(
       `${marvelApiBase}/characters?ts=${ts}&apikey=${marvelPublicKey}&hash=${hash}&${extraQuery}`
     );
-    if(!response.ok) {
-      res.send(response.statusText)
+    if (!response.ok) {
+      res.send(response.statusText);
     }
     const data = await response.json();
     res.send(data);
   } catch (error) {
-    console.log(error)
+    console.log(error);
+  }
+});
+
+app.get("/marvelCharacter", async (req, res) => {
+  const extraQuery = myQuery(req.query).slice(0, -1); ;
+  try {
+    const response = await fetch(
+      `${marvelApiBase}/characters/${extraQuery}?ts=${ts}&apikey=${marvelPublicKey}&hash=${hash}`
+    );
+    if (!response.ok) {
+      res.send(response.statusText);
+    }
+    const data = await response.json();
+    res.send(data);
+  } catch (error) {
+    console.log(error);
   }
 });
 
